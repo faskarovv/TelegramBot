@@ -1,0 +1,31 @@
+server:
+  port: 8082
+
+spring:
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+  datasource:
+    url: ${postgres.url}
+    username: ${postgres.username}
+    password:  ${postgres.password}
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  autoconfigure:
+    exclude: org.springframework.cloud.vault.config.VaultAutoConfiguration
+
+bot:
+  token: ${telegram.bot.token}
+
+file-service:
+  download:
+    uri: download-uri:https://api.telegram.org/file/bot{token}/{filePath}
+  file-info:
+    uri: https://api.telegram.org/bot<{token}/getFile?file_id={fileid}
+
+

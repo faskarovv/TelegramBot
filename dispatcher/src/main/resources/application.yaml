@@ -1,0 +1,21 @@
+server:
+  port: 8081
+
+bot:
+  name: ${telegram.bot.name}
+  token: ${telegram.bot.token}
+
+spring:
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+  autoconfigure:
+    exclude: org.springframework.cloud.vault.config.VaultAutoConfiguration
+
+logging:
+  level:
+    org.springframework.amqp: DEBUG
+    com.rabbitmq: DEBUG
+    ru.dispatcher: DEBUG

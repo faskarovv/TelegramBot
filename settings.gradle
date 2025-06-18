@@ -1,0 +1,6 @@
+rootProject.name = 'TelegramBot'
+include 'dispatcher'
+include 'node'
+include 'common-rabbitmq'
+include 'common-jpa'
+include 'rest-service'
