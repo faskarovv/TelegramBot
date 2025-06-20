@@ -13,18 +13,17 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TelegramBot extends TelegramLongPollingBot{
+public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.name}")
     private String botName;
 
     @Value("${bot.token}")
     private String botToken;
 
-
     private final UpdateController updateController;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         updateController.registerBot(this);
     }
 
@@ -44,11 +43,11 @@ public class TelegramBot extends TelegramLongPollingBot{
         updateController.processUpdate(update);
     }
 
-    public void sendAnswerMessage(SendMessage message){
-        if(message!=null){
+    public void sendAnswerMessage(SendMessage message) {
+        if (message != null) {
             try {
                 execute(message);
-            }catch (TelegramApiException e){
+            } catch (TelegramApiException e) {
                 log.error(e.getMessage());
             }
         }

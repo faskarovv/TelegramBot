@@ -22,6 +22,17 @@ spring:
 bot:
   token: ${telegram.bot.token}
 
+aws:
+  region: eu-north-1
+  access-key-id: ${access.key.id}
+  secret-access-key: ${secret.access.key}
+
+app:
+  s3:
+    bucket-name: ${bucket.name}
+    presigned-expiration-minutes: 60
+
+
 file-service:
   download:
     uri: download-uri:https://api.telegram.org/file/bot{token}/{filePath}

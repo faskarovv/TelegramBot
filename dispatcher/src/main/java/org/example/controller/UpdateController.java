@@ -18,7 +18,6 @@ public class UpdateController {
     private final MessageUtils messageUtils;
     private final UpdateProducer updateProducer;
 
-
     public void registerBot(TelegramBot telegramBot) {
         this.telegramBot = telegramBot;
     }

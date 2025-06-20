@@ -2,8 +2,6 @@ package org.example.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.AppDocument;
-import org.example.entity.AppPhoto;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
 import org.example.entity.enums.UserState;
@@ -68,7 +66,7 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-            AppPhoto photo = fileService.processPhoto(update.getMessage());
+//            AppPhoto photo = fileService.processPhoto(update.getMessage());
             var answer = "Document succesufuly downloaded here is the link \n"
                     + "httptpptptptptppt";
             sendAnswer(update.getMessage().getChatId(), answer);
@@ -90,7 +88,7 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-            AppDocument appDocument = fileService.processDoc(update.getMessage());
+//            AppDocument appDocument = fileService.processDoc(update.getMessage());
 
             //TODO add a way to generate the link
 

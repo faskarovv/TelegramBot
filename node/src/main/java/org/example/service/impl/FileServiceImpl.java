@@ -1,15 +1,11 @@
 package org.example.service.impl;
 
-import org.example.entity.AppPhoto;
-import org.example.entity.BinaryContent;
+import org.example.entity.AppFile;
 import org.example.exception.UploadFileException;
-import org.example.repo.AppPhotoRepo;
+import org.example.repo.AppFileRepo;
 import org.json.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.AppDocument;
-import org.example.repo.AppDocumentRepo;
-import org.example.repo.BinaryContentRepo;
 import org.example.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -18,18 +14,24 @@ import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    private final AppPhotoRepo appPhotoRepo;
     @Value("${bot.token}")
     private String botToken;
     @Value("${file-service.file-info.uri}")
@@ -37,78 +39,102 @@ public class FileServiceImpl implements FileService {
     @Value("${file-service.download.uri}")
     private String downloadUrl;
 
-    private final AppDocumentRepo appDocumentRepo;
-    private final BinaryContentRepo binaryContentRepo;
-    private final AppPhotoRepo photoRepo;
+    @Value("${app.s3.bucket-name}")
+    private String bucketName;
+
+    @Value("${app.s3.presigned-expiration-minutes}")
+    private int expirationTime;
+
+    private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
+    private final AppFileRepo appFileRepo;
+
 
     @Override
-    public AppDocument processDoc(Message externalMessage) {
-        Document telegramDocument = externalMessage.getDocument();
-        String fileId = telegramDocument.getFileId();
+    public AppFile processDoc(Message externalMessage) {
+        Document document = externalMessage.getDocument();
+        String fileId = document.getFileId();
 
-        ResponseEntity<String> response = getFilePath(fileId);
+        ResponseEntity<String> response = getFileJson(fileId);
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            BinaryContent persistantBinaryContent = getBinaryContent(response);
+            String filePath = getFileJson(response);
+            byte[] documentContent = fileDownload(filePath);
 
-            AppDocument appDocument = createAppDocument(telegramDocument, persistantBinaryContent);
+            String s3Key = UUID.randomUUID() + "_" + document.getFileName();
+            putToS3(s3Key, documentContent);
 
-            return appDocumentRepo.save(appDocument);
+            AppFile appFile = AppFile.builder()
+                    .telegramFileId(fileId)
+                    .s3Key(s3Key)
+                    .fileName(document.getFileName())
+                    .fileSize(document.getFileSize())
+                    .mimeType(document.getMimeType())
+                    .build();
+
+            return appFileRepo.save(appFile);
         } else {
-            throw new UploadFileException("Bad response from telegram service");
+            log.error("could not upload document");
+            throw new UploadFileException("could not upload the document");
         }
     }
 
 
     @Override
-    public AppPhoto processPhoto(Message externalMessage) {
-        PhotoSize telegramPhoto = externalMessage.getPhoto().get(0);
-        String fileId = telegramPhoto.getFileId();
+    public AppFile processPhoto(Message externalMessage) {
+        PhotoSize photo = externalMessage.getPhoto().get(0);
+        String fileId = photo.getFileId();
 
-        ResponseEntity<String> response = getFilePath(fileId);
+        ResponseEntity<String> response = getFileJson(fileId);
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            BinaryContent persistantBinaryContent = getBinaryContent(response);
+        if(response.getStatusCode() == HttpStatus.OK){
+            String filePath = getFileJson(response);
+            byte[] photoContent = fileDownload(filePath);
 
-            AppPhoto appPhoto = createAppPhoto(telegramPhoto, persistantBinaryContent);
+            String fileName = "telegram_photo_" + fileId + ".jpeg";
+            String s3Key = UUID.randomUUID() + "_" + fileName;
+            putToS3(s3Key , photoContent);
 
-            return appPhotoRepo.save(appPhoto);
-        } else {
-            throw new UploadFileException("Bad response from telegram service");
+            AppFile appFile = AppFile.builder()
+                    .telegramFileId(fileId)
+                    .s3Key(s3Key)
+                    .fileName(fileName)
+                    .fileSize(Long.valueOf(photo.getFileSize()))
+                    .mimeType("jpeg")
+                    .build();
+
+            return appFileRepo.save(appFile);
+        }else {
+            log.error("could not upload photo");
+            throw new UploadFileException("could not upload photo");
         }
     }
 
-    private BinaryContent getBinaryContent(ResponseEntity<String> response) {
-        String filePath = getFilePath(response);
-        byte[] downloadedFile = fileDownload(filePath);
-        BinaryContent temporaryBinaryContent = BinaryContent.builder()
-                .fileAsArrayOfBytes(downloadedFile)
+    private void putToS3(String s3Key, byte[] file) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
                 .build();
-        return binaryContentRepo.save(temporaryBinaryContent);
+
+        s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromBytes(file));
     }
 
-    private static String getFilePath(ResponseEntity<String> response) {
-        JSONObject jsonObject = new JSONObject(response.getBody());
+    private String generatePresignedUrl(AppFile appFile) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .key(appFile.getS3Key())
+                .bucket(bucketName)
+                .build();
 
-        return String.valueOf(
-                jsonObject.getJSONObject("result")
-                        .getString("file-path")
-        );
+        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .getObjectRequest(getObjectRequest)
+                .signatureDuration(Duration.ofMinutes(expirationTime))
+                .build();
+
+        URL presignedUrl = s3Presigner.presignGetObject(getObjectPresignRequest).url();
+
+        return presignedUrl.toString();
     }
 
-    private ResponseEntity<String> getFilePath(String fileId) {
-        RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> request = new HttpEntity<>(headers);
-
-        return template.exchange(
-                filePathUri,
-                HttpMethod.GET,
-                request,
-                String.class,
-                botToken, fileId
-        );
-    }
 
     private byte[] fileDownload(String filePath) {
         String fileUri = downloadUrl.replace("{token}", botToken)
@@ -129,20 +155,27 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private AppDocument createAppDocument(Document telegramDocument, BinaryContent persistantBinaryContent) {
-        return AppDocument.builder()
-                .telegramFileId(telegramDocument.getFileId())
-                .docName(telegramDocument.getFileName())
-                .binaryContent(persistantBinaryContent)
-                .mimeType(telegramDocument.getMimeType())
-                .fileSize(telegramDocument.getFileSize())
-                .build();
+    private static String getFileJson(ResponseEntity<String> response) {
+        assert response.getBody() != null;
+        JSONObject jsonObject = new JSONObject(response.getBody());
+
+        return String.valueOf(
+                jsonObject.getJSONObject("result")
+                        .getString("file-path")
+        );
     }
-    private AppPhoto createAppPhoto(PhotoSize telegramAppPhoto , BinaryContent persistantBinaryContent){
-        return AppPhoto.builder()
-                .telegramFileId(telegramAppPhoto.getFileId())
-                .binaryContent(persistantBinaryContent)
-                .fileSize(telegramAppPhoto.getFileSize())
-                .build();
+
+    private ResponseEntity<String> getFileJson(String fileId) {
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        return template.exchange(
+                filePathUri,
+                HttpMethod.GET,
+                request,
+                String.class,
+                botToken, fileId
+        );
     }
 }

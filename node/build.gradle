@@ -23,6 +23,11 @@ dependencies {
     implementation 'org.json:json:20240303'
     implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
     implementation "org.telegram:telegrambots-spring-boot-starter:${telegramStarterVersion}"
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:auth:2.25.42'
+
+    implementation platform('software.amazon.awssdk:bom:2.25.19')
+    implementation 'software.amazon.awssdk:s3'
 
     implementation 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
