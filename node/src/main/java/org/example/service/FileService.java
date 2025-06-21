@@ -6,4 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 public interface FileService {
     AppFile processDoc(Message externalMessage);
     AppFile processPhoto(Message externalMessage);
+
+    String generatePresignedUrl(AppFile appFile);
 }

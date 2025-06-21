@@ -87,13 +87,13 @@ public class FileServiceImpl implements FileService {
 
         ResponseEntity<String> response = getFileJson(fileId);
 
-        if(response.getStatusCode() == HttpStatus.OK){
+        if (response.getStatusCode() == HttpStatus.OK) {
             String filePath = getFileJson(response);
             byte[] photoContent = fileDownload(filePath);
 
             String fileName = "telegram_photo_" + fileId + ".jpeg";
             String s3Key = UUID.randomUUID() + "_" + fileName;
-            putToS3(s3Key , photoContent);
+            putToS3(s3Key, photoContent);
 
             AppFile appFile = AppFile.builder()
                     .telegramFileId(fileId)
@@ -104,7 +104,7 @@ public class FileServiceImpl implements FileService {
                     .build();
 
             return appFileRepo.save(appFile);
-        }else {
+        } else {
             log.error("could not upload photo");
             throw new UploadFileException("could not upload photo");
         }
@@ -119,7 +119,8 @@ public class FileServiceImpl implements FileService {
         s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromBytes(file));
     }
 
-    private String generatePresignedUrl(AppFile appFile) {
+    @Override
+    public String generatePresignedUrl(AppFile appFile) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .key(appFile.getS3Key())
                 .bucket(bucketName)

@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.entity.AppFile;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
 import org.example.entity.enums.UserState;
@@ -44,8 +45,16 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.BASIC_STATE.equals(getState)) {
             output = processServiceCommands(appUser, textMessage);
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(getState)) {
-            //TODO after implementing the registration
-            output = "waiting for confirmation";
+//            appUser.setEmail(textMessage);
+//            sendAnswer(update.getMessage().getChatId(), "go to your email to verify your account");
+
+            //todo add the service for verification here and send it to the exact email in message
+            appUser.setUserState(UserState.APPROVED_STATE);
+            appUser.setIsActive(true);
+            appUserRepo.save(appUser);
+            output ="email registered";
+        } else if (UserState.APPROVED_STATE.equals(getState)) {
+            output = "You are approved";
         } else {
             log.error("Unknown user state : {} ", getState);
             output = "Unknown command use /cancel again ";
@@ -66,9 +75,11 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-//            AppPhoto photo = fileService.processPhoto(update.getMessage());
-            var answer = "Document succesufuly downloaded here is the link \n"
-                    + "httptpptptptptppt";
+            AppFile processedDocument = fileService.processPhoto(update.getMessage());
+            String presignedUrl = fileService.generatePresignedUrl(processedDocument);
+
+            var answer = "Document successfully downloaded here is the link \n"
+                    + presignedUrl;
             sendAnswer(update.getMessage().getChatId(), answer);
         } catch (UploadFileException e) {
             log.error(e.getMessage());
@@ -88,12 +99,11 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-//            AppDocument appDocument = fileService.processDoc(update.getMessage());
-
-            //TODO add a way to generate the link
+            AppFile processedPhoto = fileService.processDoc(update.getMessage());
+            String presignedUrl = fileService.generatePresignedUrl(processedPhoto);
 
             var answer = "Photo successfully downloaded here is the link \n"
-                    + "httptpptptptptppt";
+                    + presignedUrl;
 
             sendAnswer(update.getMessage().getChatId(), answer);
         } catch (UploadFileException e) {
@@ -108,6 +118,9 @@ public class MainServiceImpl implements MainService {
         if (!appUser.getIsActive()) {
             var error = "please register in order to post your content";
             sendAnswer(chatId, error);
+
+            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+
             return true;
         } else if (UserState.BASIC_STATE.equals(userState)) {
             var error = "please register in order to post your content or activate your acc";
@@ -118,16 +131,13 @@ public class MainServiceImpl implements MainService {
     }
 
 
-    private void sendAnswer(Long chatId, String output) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(output);
-        producerService.produceAnswer(sendMessage);
-    }
-
     private String processServiceCommands(AppUser appUser, String cmd) {
         if (REGISTRATION.equals(cmd)) {
-            //todo add registration
+//            String answer = "please provide a valid email";
+//            sendAnswer(appUser.getTelegramBotId(), answer);
+            //Todo remember implementing registration
+            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+            appUserRepo.save(appUser);
             return "temperately accessed";
         } else if (HELP.equals(cmd)) {
             return help();
@@ -162,7 +172,6 @@ public class MainServiceImpl implements MainService {
                     .username(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
-                    //TODO after implementing registration change this variable
                     .isActive(true)
                     .userState(UserState.BASIC_STATE)
                     .build();
@@ -178,6 +187,13 @@ public class MainServiceImpl implements MainService {
                 .build();
 
         rawDataRepo.save(rawData);
+    }
+
+    private void sendAnswer(Long chatId, String output) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(output);
+        producerService.produceAnswer(sendMessage);
     }
 
 }
