@@ -45,13 +45,8 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.BASIC_STATE.equals(getState)) {
             output = processServiceCommands(appUser, textMessage);
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(getState)) {
-//            appUser.setEmail(textMessage);
-//            sendAnswer(update.getMessage().getChatId(), "go to your email to verify your account");
-
             //todo add the service for verification here and send it to the exact email in message
-            appUser.setUserState(UserState.APPROVED_STATE);
-            appUser.setIsActive(true);
-            appUserRepo.save(appUser);
+
             output ="email registered";
         } else if (UserState.APPROVED_STATE.equals(getState)) {
             output = "You are approved";
@@ -71,6 +66,10 @@ public class MainServiceImpl implements MainService {
         var appUser = findOrSaveAppUser(update);
         var chatId = update.getMessage().getChatId();
 
+        var message = update.getMessage();
+        if(message.getPhoto() == null){
+            return;
+        }
         if (isNotAllowedToSendMessage(appUser, chatId)) {
             return;
         }
@@ -95,6 +94,10 @@ public class MainServiceImpl implements MainService {
         var appUser = findOrSaveAppUser(update);
         var chatId = update.getMessage().getChatId();
 
+        var message = update.getMessage();
+        if(message.getDocument() == null){
+            return;
+        }
         if (isNotAllowedToSendMessage(appUser, chatId)) {
             return;
         }
@@ -114,19 +117,19 @@ public class MainServiceImpl implements MainService {
     }
 
     private boolean isNotAllowedToSendMessage(AppUser appUser, Long chatId) {
-        var userState = appUser.getUserState();
-        if (!appUser.getIsActive()) {
-            var error = "please register in order to post your content";
-            sendAnswer(chatId, error);
-
-            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
-
-            return true;
-        } else if (UserState.BASIC_STATE.equals(userState)) {
-            var error = "please register in order to post your content or activate your acc";
-            sendAnswer(chatId, error);
-            return true;
-        }
+//        var userState = appUser.getUserState();
+//        if (!appUser.getIsActive()) {
+//            var error = "please register in order to post your content";
+//            sendAnswer(chatId, error);
+//
+//            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+//
+//            return true;
+//        } else if (UserState.BASIC_STATE.equals(userState)) {
+//            var error = "please register in order to post your content or activate your acc";
+//            sendAnswer(chatId, error);
+//            return true;
+//        }
         return false;
     }
 
@@ -136,8 +139,8 @@ public class MainServiceImpl implements MainService {
 //            String answer = "please provide a valid email";
 //            sendAnswer(appUser.getTelegramBotId(), answer);
             //Todo remember implementing registration
-            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
-            appUserRepo.save(appUser);
+//            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+//            appUserRepo.save(appUser);
             return "temperately accessed";
         } else if (HELP.equals(cmd)) {
             return help();

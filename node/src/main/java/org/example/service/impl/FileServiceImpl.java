@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -82,7 +83,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public AppFile processPhoto(Message externalMessage) {
-        PhotoSize photo = externalMessage.getPhoto().get(0);
+        List<PhotoSize> photos = externalMessage.getPhoto();
+        PhotoSize photo = photos.get(photos.size() - 1);
         String fileId = photo.getFileId();
 
         ResponseEntity<String> response = getFileJson(fileId);

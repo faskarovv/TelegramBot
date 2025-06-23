@@ -37,8 +37,8 @@ app:
 
 file-service:
   download:
-    uri: download-uri:https://api.telegram.org/file/bot{token}/{filePath}
+    uri: https://api.telegram.org/file/bot{token}/{filePath}
   file-info:
-    uri: https://api.telegram.org/bot<{token}/getFile?file_id={fileid}
+    uri: https://api.telegram.org/bot{token}/getFile?file_id={fileId}
 
 
