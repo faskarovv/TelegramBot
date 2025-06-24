@@ -45,7 +45,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public String generateToken(String email) {
         AppUser appUser = appUserRepo.findAppUserByEmail(email).orElseThrow(
-                () -> new RuntimeException("no appuser exists with that email")
+                () -> new RuntimeException("no app user exists with that email")
         );
         String token = UUID.randomUUID().toString();
 

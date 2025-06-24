@@ -33,6 +33,7 @@ public class MainServiceImpl implements MainService {
     public void processTextMessage(Update update) {
         saveRawData(update);
 
+        var userEmail = update.getMessage().toString();
         var appUser = findOrSaveAppUser(update);
         var getState = appUser.getUserState();
         var textMessage = update.getMessage().getText();
@@ -45,9 +46,13 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.BASIC_STATE.equals(getState)) {
             output = processServiceCommands(appUser, textMessage);
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(getState)) {
-            //todo add the service for verification here and send it to the exact email in message
+            if (userEmail.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                producerService.produceEmailReq(userEmail);
 
-            output ="email registered";
+                output = "email sent to user please check your email";
+            } else {
+                output = "provide a valid email!!!!!!!";
+            }
         } else if (UserState.APPROVED_STATE.equals(getState)) {
             output = "You are approved";
         } else {
@@ -67,7 +72,7 @@ public class MainServiceImpl implements MainService {
         var chatId = update.getMessage().getChatId();
 
         var message = update.getMessage();
-        if(message.getPhoto() == null){
+        if (message.getPhoto() == null) {
             return;
         }
         if (isNotAllowedToSendMessage(appUser, chatId)) {
@@ -95,7 +100,7 @@ public class MainServiceImpl implements MainService {
         var chatId = update.getMessage().getChatId();
 
         var message = update.getMessage();
-        if(message.getDocument() == null){
+        if (message.getDocument() == null) {
             return;
         }
         if (isNotAllowedToSendMessage(appUser, chatId)) {
@@ -117,30 +122,30 @@ public class MainServiceImpl implements MainService {
     }
 
     private boolean isNotAllowedToSendMessage(AppUser appUser, Long chatId) {
-//        var userState = appUser.getUserState();
-//        if (!appUser.getIsActive()) {
-//            var error = "please register in order to post your content";
-//            sendAnswer(chatId, error);
-//
-//            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
-//
-//            return true;
-//        } else if (UserState.BASIC_STATE.equals(userState)) {
-//            var error = "please register in order to post your content or activate your acc";
-//            sendAnswer(chatId, error);
-//            return true;
-//        }
+        var userState = appUser.getUserState();
+        if (!appUser.getIsActive()) {
+            var error = "please register in order to post your content";
+            sendAnswer(chatId, error);
+
+            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+
+            return true;
+        } else if (UserState.BASIC_STATE.equals(userState)) {
+            var error = "please register in order to post your content or activate your acc";
+            sendAnswer(chatId, error);
+            return true;
+        }
         return false;
     }
 
 
     private String processServiceCommands(AppUser appUser, String cmd) {
         if (REGISTRATION.equals(cmd)) {
-//            String answer = "please provide a valid email";
-//            sendAnswer(appUser.getTelegramBotId(), answer);
-            //Todo remember implementing registration
-//            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
-//            appUserRepo.save(appUser);
+            String answer = "please provide a valid email";
+            sendAnswer(appUser.getTelegramBotId(), answer);
+
+            appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
+            appUserRepo.save(appUser);
             return "temperately accessed";
         } else if (HELP.equals(cmd)) {
             return help();

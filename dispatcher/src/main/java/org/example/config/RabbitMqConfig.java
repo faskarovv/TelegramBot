@@ -25,29 +25,34 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory){
+    public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
-        return  rabbitTemplate;
+        return rabbitTemplate;
     }
 
     @Bean
-    public Queue textMessageQueue(){
+    public Queue textMessageQueue() {
         return new Queue(TEXT_MESSAGE_UPDATE);
     }
 
     @Bean
-    public Queue docMessageQueue(){
+    public Queue docMessageQueue() {
         return new Queue(DOC_MESSAGE_UPDATE);
     }
 
     @Bean
-    public Queue photoMessageQueue(){
+    public Queue photoMessageQueue() {
         return new Queue(PHOTO_MESSAGE_UPDATE);
     }
 
     @Bean
-    public Queue answerMessageQueue(){
+    public Queue answerMessageQueue() {
         return new Queue(ANSWER_MESSAGE);
+    }
+
+    @Bean
+    public Queue emailSendQueue() {
+        return new Queue(EMAIL_SEND_QUEUE);
     }
 }

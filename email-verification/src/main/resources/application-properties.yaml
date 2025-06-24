@@ -13,4 +13,16 @@ spring:
           auth: true
           starttls:
             enable: true
-
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+  datasource:
+    url: ${postgres.url}
+    username: ${postgres.username}
+    password: ${postgres.password}
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop

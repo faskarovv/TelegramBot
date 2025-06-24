@@ -143,8 +143,7 @@ public class FileServiceImpl implements FileService {
         String fileUri = downloadUrl.replace("{token}", botToken)
                 .replace("{filePath}", filePath);
 
-        URL object = null;
-
+        URL object;
         try {
             object = new URL(fileUri);
         } catch (MalformedURLException e) {
@@ -164,7 +163,7 @@ public class FileServiceImpl implements FileService {
 
         return String.valueOf(
                 jsonObject.getJSONObject("result")
-                        .getString("file-path")
+                        .getString("file_path")
         );
     }
 

@@ -1,4 +1,4 @@
-package org.controller;
+package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.service.EmailSendService;

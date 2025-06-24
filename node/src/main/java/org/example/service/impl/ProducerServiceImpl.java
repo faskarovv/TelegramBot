@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import static org.example.RabbitMqQueue.ANSWER_MESSAGE;
+import static org.example.RabbitMqQueue.EMAIL_SEND_QUEUE;
 
 @Service
 @RequiredArgsConstructor
@@ -16,5 +17,9 @@ public class ProducerServiceImpl implements ProducerService {
     @Override
     public void produceAnswer(SendMessage sendMessage) {
         rabbitTemplate.convertAndSend(ANSWER_MESSAGE, sendMessage);
+    }
+    @Override
+    public void produceEmailReq(String email){
+        rabbitTemplate.convertAndSend(EMAIL_SEND_QUEUE , email);
     }
 }
