@@ -6,13 +6,14 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: ${email.username}
-    password: ${app.password}
+    password: ${mail.password}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+            required: true
   rabbitmq:
     host: ${rabbitmq.host}
     port: ${rabbitmq.port}
@@ -24,5 +25,5 @@ spring:
     password: ${postgres.password}
   jpa:
     generate-ddl: true
-    hibernate:
-      ddl-auto: create-drop
+  autoconfigure:
+    exclude: org.springframework.cloud.vault.config.VaultAutoConfiguration

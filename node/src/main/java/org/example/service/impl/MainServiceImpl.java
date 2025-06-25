@@ -33,7 +33,7 @@ public class MainServiceImpl implements MainService {
     public void processTextMessage(Update update) {
         saveRawData(update);
 
-        var userEmail = update.getMessage().toString();
+        var userEmail = update.getMessage().getText();
         var appUser = findOrSaveAppUser(update);
         var getState = appUser.getUserState();
         var textMessage = update.getMessage().getText();
@@ -47,6 +47,8 @@ public class MainServiceImpl implements MainService {
             output = processServiceCommands(appUser, textMessage);
         } else if (UserState.WAIT_FOR_EMAIL_STATE.equals(getState)) {
             if (userEmail.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                appUser.setEmail(userEmail);
+                appUserRepo.save(appUser);
                 producerService.produceEmailReq(userEmail);
 
                 output = "email sent to user please check your email";
@@ -141,12 +143,9 @@ public class MainServiceImpl implements MainService {
 
     private String processServiceCommands(AppUser appUser, String cmd) {
         if (REGISTRATION.equals(cmd)) {
-            String answer = "please provide a valid email";
-            sendAnswer(appUser.getTelegramBotId(), answer);
-
             appUser.setUserState(UserState.WAIT_FOR_EMAIL_STATE);
             appUserRepo.save(appUser);
-            return "temperately accessed";
+            return "please provide a valid email";
         } else if (HELP.equals(cmd)) {
             return help();
         } else if (START.equals(cmd)) {
@@ -180,7 +179,7 @@ public class MainServiceImpl implements MainService {
                     .username(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
-                    .isActive(true)
+                    .isActive(false)
                     .userState(UserState.BASIC_STATE)
                     .build();
             return appUserRepo.save(transientAppUser);

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.AppUser;
 import org.example.entity.UserToken;
+import org.example.entity.enums.UserState;
 import org.example.repo.AppUserRepo;
 import org.example.repo.UserTokenRepo;
 import org.example.service.VerificationService;
@@ -39,6 +40,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         AppUser verifiedUser = userToken.getAppUser();
         verifiedUser.setIsActive(true);
+        verifiedUser.setUserState(UserState.APPROVED_STATE);
         appUserRepo.save(verifiedUser);
     }
 
@@ -49,12 +51,13 @@ public class VerificationServiceImpl implements VerificationService {
         );
         String token = UUID.randomUUID().toString();
 
-        return UserToken.builder()
+        UserToken userToken = UserToken.builder()
                 .token(token)
                 .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
                 .used(false)
-                .appUser(appUser)
-                .build().toString();
+                .appUser(appUser).build();
+
+        return token;
     }
 
 }
