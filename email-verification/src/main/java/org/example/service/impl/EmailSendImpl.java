@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.repo.AppUserRepo;
 import org.example.service.EmailSendService;
 import org.example.service.VerificationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,14 @@ public class EmailSendImpl implements EmailSendService {
     private final VerificationService verificationService;
     private final AppUserRepo appUserRepo;
 
+    @Value("${app.verfication.base-url}")
+    private String baseUrl;
+
     @Override
     public boolean sendVerificationEmail(String email) {
         try {
             String token = verificationService.generateToken(email);
-            String verificationUrl = "http://your-domain.com/verify?token=" + token;
+            String verificationUrl = baseUrl + "/verify?token=" + token;
 
             log.info("Attempting to send email to: {}", email);
 
@@ -37,7 +41,6 @@ public class EmailSendImpl implements EmailSendService {
                     "Your verification email is: <b>%s</b><br> ",
                     verificationUrl
             ), true);
-
 
             javaMailSender.send(message);
 

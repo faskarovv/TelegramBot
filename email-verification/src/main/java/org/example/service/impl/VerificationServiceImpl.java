@@ -46,17 +46,26 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public String generateToken(String email) {
+        String token = UUID.randomUUID().toString();
+
         AppUser appUser = appUserRepo.findAppUserByEmail(email).orElseThrow(
                 () -> new RuntimeException("no app user exists with that email")
         );
-        String token = UUID.randomUUID().toString();
+        UserToken existingUserToken = userTokenRepo.findUserTokenByAppUser(appUser);
+        if (existingUserToken != null) {
+            existingUserToken.setToken(token);
+            existingUserToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(15)));
+            existingUserToken.setUsed(false);
+            userTokenRepo.save(existingUserToken);
+        } else {
+            UserToken newUserToken = UserToken.builder()
+                    .token(token)
+                    .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
+                    .used(false)
+                    .appUser(appUser).build();
 
-        UserToken userToken = UserToken.builder()
-                .token(token)
-                .expiresAt(Instant.now().plus(Duration.ofMinutes(15)))
-                .used(false)
-                .appUser(appUser).build();
-
+            userTokenRepo.save(newUserToken);
+        }
         return token;
     }
 
