@@ -62,7 +62,7 @@ public class UpdateController {
     }
 
     private void setFileIsReceivedView(Update update) {
-        var sendMessage = MessageUtils.generateSendMessageWithText(update, "Great! Wait until process ends");
+        var sendMessage = MessageUtils.generateSendMessageWithText(update, "Great! Wait until the process ends");
         setView(sendMessage);
     }
 
@@ -79,6 +79,5 @@ public class UpdateController {
 
     private void processTextMessage(Update update) {
         updateProducer.produce(RabbitMqQueue.TEXT_MESSAGE_UPDATE, update);
-        setFileIsReceivedView(update);
     }
 }
