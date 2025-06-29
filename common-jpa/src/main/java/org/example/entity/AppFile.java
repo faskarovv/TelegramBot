@@ -1,9 +1,6 @@
 package org.example.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
@@ -26,4 +23,8 @@ public class AppFile {
     private Long fileSize;
 
     private Instant uploadedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")
+    private AppUser appUser;
 }

@@ -1,6 +1,5 @@
 package org.example.entity;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -9,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,5 +42,8 @@ public class AppUser {
 
     @OneToOne(mappedBy = "appUser")
     private UserToken userToken;
+
+    @OneToMany(mappedBy = "appUser")
+    private List<AppFile> appFileList;
 
 }

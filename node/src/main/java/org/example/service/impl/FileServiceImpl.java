@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import org.example.entity.AppFile;
+import org.example.entity.AppUser;
 import org.example.exception.UploadFileException;
 import org.example.repo.AppFileRepo;
 import org.json.JSONObject;
@@ -52,7 +53,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public AppFile processDoc(Message externalMessage) {
+    public AppFile processDoc(Message externalMessage, AppUser appUser) {
         Document document = externalMessage.getDocument();
         String fileId = document.getFileId();
 
@@ -71,6 +72,7 @@ public class FileServiceImpl implements FileService {
                     .fileName(document.getFileName())
                     .fileSize(document.getFileSize())
                     .mimeType(document.getMimeType())
+                    .appUser(appUser)
                     .build();
 
             return appFileRepo.save(appFile);
@@ -82,7 +84,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public AppFile processPhoto(Message externalMessage) {
+    public AppFile processPhoto(Message externalMessage, AppUser appUser) {
         List<PhotoSize> photos = externalMessage.getPhoto();
         PhotoSize photo = photos.get(photos.size() - 1);
         String fileId = photo.getFileId();
@@ -103,6 +105,7 @@ public class FileServiceImpl implements FileService {
                     .fileName(fileName)
                     .fileSize(Long.valueOf(photo.getFileSize()))
                     .mimeType("jpeg")
+                    .appUser(appUser)
                     .build();
 
             return appFileRepo.save(appFile);
