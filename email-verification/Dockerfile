@@ -2,7 +2,7 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY build/libs/email-verification-1.0-SNAPSHOT-plain.jar app.jar
+COPY build/libs/email-verification-1.0-SNAPSHOT.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
