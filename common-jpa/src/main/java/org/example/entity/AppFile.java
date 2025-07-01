@@ -22,6 +22,7 @@ public class AppFile {
     private String fileName;
     private Long fileSize;
 
+    @Column(nullable = false)
     private Instant uploadedAt;
 
     @ManyToOne

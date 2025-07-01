@@ -1,9 +1,11 @@
 server:
   port: 8081
-
+  ssl:
+    enabled: false
 bot:
   name: ${telegram.bot.name}
   token: ${telegram.bot.token}
+  uri: https://1519-160-202-24-20.ngrok-free.app/callback/update
 
 spring:
   rabbitmq:
@@ -19,3 +21,6 @@ logging:
     org.springframework.amqp: DEBUG
     com.rabbitmq: DEBUG
     ru.dispatcher: DEBUG
+    org.telegram: DEBUG
+    org.springframework.web: DEBUG
+

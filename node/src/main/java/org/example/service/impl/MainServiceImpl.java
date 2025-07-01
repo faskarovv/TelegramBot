@@ -17,6 +17,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.example.service.enums.ServiceCommands.*;
@@ -49,14 +51,48 @@ public class MainServiceImpl implements MainService {
             output = sendEmailToUser(userEmail, appUser);
         } else if (UserState.APPROVED_STATE.equals(getState)) {
             output = processServiceCommands(appUser, textMessage);
+        } else if (UserState.WAIT_FOR_DATE.equals(appUser.getUserState())) {
+            output = processDateHistory(appUser ,textMessage);
+            appUser.setUserState(UserState.APPROVED_STATE);
+            appUserRepo.save(appUser);
         } else {
             log.error("Unknown user state : {} ", getState);
             output = "Unknown command use /cancel again ";
         }
 
-
         var chatId = update.getMessage().getChatId();
         sendAnswer(chatId, output);
+    }
+
+    private String processDateHistory(AppUser appUser, String textMessage) {
+        try{
+            int days = Integer.parseInt(textMessage.trim());
+
+            if(days <= 0){
+                return "please provide a valid date (for example 2 is going to show archive of past 2 days)";
+            }
+            Instant endDate = Instant.now();
+            Instant startDate = endDate.minus(days , ChronoUnit.DAYS);
+
+            List<AppFile> files = appFileRepo.findAllByAppUserAndUploadedAtBetween(
+                    appUser,
+                    startDate,
+                    endDate
+            );
+
+            if (files.isEmpty()){
+                return "no files were uploaded";
+            }
+
+            files.forEach(file -> {
+                String presignedUrl = fileService.generatePresignedUrl(file);
+                sendAnswer(appUser.getTelegramBotId() , presignedUrl);
+            });
+
+            return "Here are the files you requested" + days;
+        } catch (RuntimeException e) {
+            return "please just enter a number";
+        }
     }
 
     private String sendEmailToUser(String userEmail, AppUser appUser) {
@@ -154,9 +190,17 @@ public class MainServiceImpl implements MainService {
                 return history(appUser);
             }
             return "user should be approved";
+        } else if (HISTORY_RANGE.equals(cmd)) {
+            return changeUserStateHistory(appUser);
         } else {
             return "not a valid command";
         }
+    }
+
+    private String changeUserStateHistory(AppUser appUser) {
+        appUser.setUserState(UserState.WAIT_FOR_DATE);
+        appUserRepo.save(appUser);
+        return "How many days should I look up";
     }
 
     private String history(AppUser appUser) {
@@ -165,7 +209,6 @@ public class MainServiceImpl implements MainService {
         if(userAppFiles.isEmpty()){
             return "no files were uploaded";
         }
-
 
         userAppFiles.forEach(file -> {
             String presignedUrl = fileService.generatePresignedUrl(file);
@@ -186,7 +229,8 @@ public class MainServiceImpl implements MainService {
                 List of possible commands:\s
                 /cancel - cancellation of the current command\s
                 /registration - registration of the user\s
-                /history - resends the past urls""";
+                /history - resends the past urls
+                /historyRange - resends the past urls depending on date""";
     }
 
     private String cancelProcess(AppUser appUser) {

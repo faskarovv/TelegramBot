@@ -2,7 +2,7 @@ package org.example.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.controller.UpdateController;
+import org.example.controller.UpdateProcess;
 import org.example.service.AnswerConsumer;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import static org.example.RabbitMqQueue.ANSWER_MESSAGE;
 @RequiredArgsConstructor
 public class AnswerConsumerImpl implements AnswerConsumer {
 
-    private final UpdateController updateController;
+    private final UpdateProcess updateController;
 
     @Override
     @RabbitListener(queues = ANSWER_MESSAGE)

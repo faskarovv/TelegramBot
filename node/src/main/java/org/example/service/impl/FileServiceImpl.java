@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +73,7 @@ public class FileServiceImpl implements FileService {
                     .fileName(document.getFileName())
                     .fileSize(document.getFileSize())
                     .mimeType(document.getMimeType())
+                    .uploadedAt(Instant.now())
                     .appUser(appUser)
                     .build();
 
@@ -105,6 +107,7 @@ public class FileServiceImpl implements FileService {
                     .fileName(fileName)
                     .fileSize(Long.valueOf(photo.getFileSize()))
                     .mimeType("jpeg")
+                    .uploadedAt(Instant.now())
                     .appUser(appUser)
                     .build();
 

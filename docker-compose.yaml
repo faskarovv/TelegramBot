@@ -25,6 +25,11 @@ services:
       - POSTGRES_PASSWORD=12345
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgresNodeDb
+  node:
+    image: registry.digitalocean.com/telegrambot/node
+    ports:
+      - 8082:8080
+
 
 volumes:
   rabbitmq-lib:

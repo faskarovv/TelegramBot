@@ -5,7 +5,8 @@ public enum ServiceCommands {
     REGISTRATION("/registration"),
     CANCEL("/cancel"),
     START("/start"),
-    HISTORY("/history");
+    HISTORY("/history"),
+    HISTORY_RANGE("/historyRange");
     private final String value;
 
     ServiceCommands(String value) {
