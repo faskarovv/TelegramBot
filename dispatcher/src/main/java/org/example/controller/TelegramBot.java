@@ -46,7 +46,7 @@ public class TelegramBot extends TelegramWebhookBot {
 
     @Override
     public String getBotPath() {
-        return "";
+        return "/callback/update";
     }
 
     public void sendAnswerMessage(SendMessage message) {

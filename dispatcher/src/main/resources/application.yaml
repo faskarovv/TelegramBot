@@ -5,7 +5,7 @@ server:
 bot:
   name: ${telegram.bot.name}
   token: ${telegram.bot.token}
-  uri: https://1519-160-202-24-20.ngrok-free.app/callback/update
+  uri: https://faridtgbot.com/callback/update
 
 spring:
   rabbitmq:
