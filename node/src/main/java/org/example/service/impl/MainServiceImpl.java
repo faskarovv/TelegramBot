@@ -52,7 +52,7 @@ public class MainServiceImpl implements MainService {
         } else if (UserState.APPROVED_STATE.equals(getState)) {
             output = processServiceCommands(appUser, textMessage);
         } else if (UserState.WAIT_FOR_DATE.equals(appUser.getUserState())) {
-            output = processDateHistory(appUser ,textMessage);
+            output = processDateHistory(appUser, textMessage);
             appUser.setUserState(UserState.APPROVED_STATE);
             appUserRepo.save(appUser);
         } else {
@@ -65,14 +65,14 @@ public class MainServiceImpl implements MainService {
     }
 
     private String processDateHistory(AppUser appUser, String textMessage) {
-        try{
+        try {
             int days = Integer.parseInt(textMessage.trim());
 
-            if(days <= 0){
+            if (days <= 0) {
                 return "please provide a valid date (for example 2 is going to show archive of past 2 days)";
             }
             Instant endDate = Instant.now();
-            Instant startDate = endDate.minus(days , ChronoUnit.DAYS);
+            Instant startDate = endDate.minus(days, ChronoUnit.DAYS);
 
             List<AppFile> files = appFileRepo.findAllByAppUserAndUploadedAtBetween(
                     appUser,
@@ -80,13 +80,13 @@ public class MainServiceImpl implements MainService {
                     endDate
             );
 
-            if (files.isEmpty()){
+            if (files.isEmpty()) {
                 return "no files were uploaded";
             }
 
             files.forEach(file -> {
                 String presignedUrl = fileService.generatePresignedUrl(file);
-                sendAnswer(appUser.getTelegramBotId() , presignedUrl);
+                sendAnswer(appUser.getTelegramBotId(), presignedUrl);
             });
 
             return "Here are the files you requested" + days;
@@ -123,7 +123,7 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-            AppFile processedDocument = fileService.processPhoto(update.getMessage() , appUser);
+            AppFile processedDocument = fileService.processPhoto(update.getMessage(), appUser);
             String presignedUrl = fileService.generatePresignedUrl(processedDocument);
 
             var answer = "Document successfully downloaded here is the link \n"
@@ -149,7 +149,7 @@ public class MainServiceImpl implements MainService {
             return;
         }
         try {
-            AppFile processedPhoto = fileService.processDoc(update.getMessage() , appUser);
+            AppFile processedPhoto = fileService.processDoc(update.getMessage(), appUser);
             String presignedUrl = fileService.generatePresignedUrl(processedPhoto);
 
             var answer = "Photo successfully downloaded here is the link \n"
@@ -191,7 +191,10 @@ public class MainServiceImpl implements MainService {
             }
             return "user should be approved";
         } else if (HISTORY_RANGE.equals(cmd)) {
-            return changeUserStateHistory(appUser);
+            if (appUser.getUserState().equals(UserState.APPROVED_STATE)) {
+                return changeUserStateHistory(appUser);
+            }
+            return "user should be approved";
         } else {
             return "not a valid command";
         }
@@ -206,13 +209,13 @@ public class MainServiceImpl implements MainService {
     private String history(AppUser appUser) {
         List<AppFile> userAppFiles = appFileRepo.findAllByAppUser(appUser);
 
-        if(userAppFiles.isEmpty()){
+        if (userAppFiles.isEmpty()) {
             return "no files were uploaded";
         }
 
         userAppFiles.forEach(file -> {
             String presignedUrl = fileService.generatePresignedUrl(file);
-            sendAnswer(appUser.getTelegramBotId() , presignedUrl);
+            sendAnswer(appUser.getTelegramBotId(), presignedUrl);
         });
 
         return "Here are the files you uploaded";

@@ -3,7 +3,6 @@ package org.example.service.impl;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.repo.AppUserRepo;
 import org.example.service.EmailSendService;
 import org.example.service.VerificationService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +17,8 @@ public class EmailSendImpl implements EmailSendService {
 
     private final JavaMailSender javaMailSender;
     private final VerificationService verificationService;
-    private final AppUserRepo appUserRepo;
 
-    @Value("${app.verfication.base-url}")
+    @Value("${app.verification.base-url}")
     private String baseUrl;
 
     @Override

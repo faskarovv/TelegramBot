@@ -17,7 +17,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "id")
-@Table(name = "app_user")
+@Table(name = "app_user",
+    indexes = {
+        @Index(name = "idx_email" , columnList = "email")
+    }
+)
 public class AppUser {
 
     @Id
@@ -40,10 +44,9 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private UserState userState;
 
-    @OneToOne(mappedBy = "appUser")
-    private UserToken userToken;
+//    @OneToOne(mappedBy = "appUser")
+//    private UserToken userToken;
 
     @OneToMany(mappedBy = "appUser")
     private List<AppFile> appFileList;
-
 }

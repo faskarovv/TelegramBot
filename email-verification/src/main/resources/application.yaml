@@ -29,5 +29,5 @@ spring:
     exclude: org.springframework.cloud.vault.config.VaultAutoConfiguration
 
 app:
-  verfication:
+  verification:
     base-url: https://faridtgbot.com

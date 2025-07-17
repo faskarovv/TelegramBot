@@ -19,7 +19,7 @@ public class EmailConfig {
 
 
     @Bean
-    public JavaMailSender javaMailSender(){
+    public JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
         javaMailSender.setHost("smtp.gmail.com");
@@ -29,10 +29,10 @@ public class EmailConfig {
 
 
         Properties properties = new Properties();
-        properties.put("mail.transport.protocol" , "smtp");
-        properties.put("mail.smtp.auth" , "true");
-        properties.put("mail.smtp.starttls.enable" , "true");
-        properties.put("mail.debug" , "true");
+        properties.put("mail.transport.protocol", "smtp");
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.debug", "true");
 
         javaMailSender.setJavaMailProperties(properties);
 

@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface AppUserRepo extends JpaRepository<AppUser , Long> {
     AppUser findAppUserByTelegramBotId(Long id);
 
-    Optional<AppUser> findAppUserByEmail(String email);
+    AppUser findAppUserByEmail(String email);
 }

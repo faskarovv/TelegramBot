@@ -1,3 +1,4 @@
+version: "3.8"
 
 services:
   rabbitmq:
@@ -14,6 +15,7 @@ services:
     volumes:
       - rabbitmq-lib:/var/lib/rabbitmq/
       - rabbitmq-log:/var/log/rabbitmq
+
   postgres:
     image: postgres:14-alpine
     restart: unless-stopped
@@ -25,43 +27,9 @@ services:
       - POSTGRES_PASSWORD=12345
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgresNodeDb
-  node:
-    image: faskarovv/telegrambot-node
-    platform: linux/amd64
-    ports:
-      - "8082:8080"
-    env_file:
-      - node1.env
-    depends_on:
-      - postgres
-      - rabbitmq
-      - dispatcher
-  dispatcher:
-    image: faskarovv/telegrambot-dispatcher
-    platform: linux/amd64
-    ports:
-      - "8081:8080"
-    env_file:
-      - dispatcher.env
-    depends_on:
-      - postgres
-      - rabbitmq
-  email-verification:
-    image: faskarovv/telegrambot-emailverification
-    platform: linux/amd64
-    ports:
-      - "8085:8080"
-    env_file:
-      - emailVerification.env
-    depends_on:
-      - postgres
-      - rabbitmq
-      - node
-      - dispatcher
 
 volumes:
   rabbitmq-lib:
     driver: local
   rabbitmq-log:
     driver: local
-
