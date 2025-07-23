@@ -1,0 +1,11 @@
+name: Build and Deploy telegram bot
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  build-deploy:
+  name: Build and Deploy Telegram bot
