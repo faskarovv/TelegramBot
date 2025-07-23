@@ -18,6 +18,6 @@ public class ConsumeEmailReqImpl implements ConsumeEmailReq {
     @RabbitListener(queues = EMAIL_SEND_QUEUE )
     public void consumeEmailReq(String email) {
         log.info("Attempting to consume email {}" , email);
-        emailSend.sendEmail(email);
+        emailSend.sendVerificationEmail(email);
     }
 }

@@ -50,7 +50,7 @@ public class VerificationServiceImpl implements VerificationService {
             verifiedUser.setUserState(UserState.APPROVED_STATE);
             log.info("trying to save the verified user");
             feignClient.saveVerifiedAppUser(verifiedUser);
-            log.info("trying to save updated user token");
+            log.info("trying to save");
             feignClient.updateUserToken(userToken);
         } catch (FeignException.NotFound e) {
             throw new RuntimeException("Token not found");

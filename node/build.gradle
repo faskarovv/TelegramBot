@@ -39,7 +39,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 bootJar {
-    archiveFileName = 'app.jar'
+    archiveFileName = 'node-1.0-SNAPSHOT.jar'
 }
 
 test {

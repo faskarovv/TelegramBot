@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,5 +28,6 @@ public class AppFile {
 
     @ManyToOne
     @JoinColumn(name = "app_user_id")
+    @JsonBackReference
     private AppUser appUser;
 }

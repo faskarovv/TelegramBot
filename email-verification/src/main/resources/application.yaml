@@ -2,18 +2,6 @@ server:
   port: 8085
 
 spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${email.username}
-    password: ${mail.password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
   rabbitmq:
     host: ${rabbitmq.host}
     port: ${rabbitmq.port}
@@ -25,8 +13,18 @@ spring:
     password: ${postgres.password}
   jpa:
     generate-ddl: true
+  main:
+    allow-bean-definition-overriding: true
   autoconfigure:
     exclude: org.springframework.cloud.vault.config.VaultAutoConfiguration
+  cloud:
+    vault:
+      enabled: false
+
+
+bravo:
+  api:
+    key: ${bravo.api.key}
 
 app:
   verification:

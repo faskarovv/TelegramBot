@@ -105,6 +105,7 @@ public class FeignController {
             return ResponseEntity.ok(savedAppUser.get());
         }
         return ResponseEntity.notFound().build();
+
     }
 
 }

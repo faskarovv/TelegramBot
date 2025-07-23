@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -48,5 +49,6 @@ public class AppUser {
 //    private UserToken userToken;
 
     @OneToMany(mappedBy = "appUser")
+    @JsonManagedReference
     private List<AppFile> appFileList;
 }
