@@ -34,6 +34,9 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
       - name: login to dockerhub
         uses: docker/login-action@v3
         with:
@@ -43,7 +46,7 @@ jobs:
       - name: build and push dispatcher service
         uses: docker/build-push-action@v6
         with:
-          context: ./dispatcher
+          context: ./dispatcher/Dockerfile
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-dispatcher
@@ -52,7 +55,7 @@ jobs:
       - name: build and push node service
         uses: docker/build-push-action@v6
         with:
-          context: ./node
+          context: ./node/Dockerfile
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-node
@@ -61,7 +64,7 @@ jobs:
       - name: build and push email verification service
         uses: docker/build-push-action@v6
         with:
-          context: ./email-verification
+          context: ./email-verification/Dockerfile
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
