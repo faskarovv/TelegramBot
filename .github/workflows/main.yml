@@ -29,14 +29,6 @@ jobs:
       - name: running tests
         run: ./gradlew test
 
-  docker-build-and-push:
-    name: building and pushing into docker hub
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
       - name: login to dockerhub
         uses: docker/login-action@v3
         with:
