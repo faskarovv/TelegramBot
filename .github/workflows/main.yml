@@ -62,15 +62,26 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
 
-#  deploy:
-#    name: deploy into droplet
-#    needs: docker-build-and-push
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: ssh and deploy
-#        uses: appleboy/ssh-action@v1.0.0
-#        with:
+  deploy:
+    name: deploy into droplet
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{secrets.HOST_USERNAME}}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          env: DOCKER_HUB_USERNAME,DOCKER_HUB_ACCESS_TOKEN
+          script: |
+            echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
 
+            cd /opt/telegrambot
+            
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d --build
 
 
 
