@@ -19,6 +19,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+          dependency-graph: false
 
       - name: makes executable
         run: chmod +x ./gradlew
