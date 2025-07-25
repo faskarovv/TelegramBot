@@ -11,7 +11,7 @@ jobs:
     name: Build and Deploy Telegram bot
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       actions: read
     steps:
       - name: checkout code
@@ -22,7 +22,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          dependency-graph: false
+
 
       - name: makes executable
         run: chmod +x ./gradlew
