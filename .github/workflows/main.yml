@@ -63,7 +63,7 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
 
   deploy:
-    name: deploy into droplet
+    name: deploying into droplet
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +71,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
-          username: ${{secrets.HOST_USERNAME}}
+          username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           env: DOCKER_HUB_USERNAME,DOCKER_HUB_ACCESS_TOKEN
           script: |
