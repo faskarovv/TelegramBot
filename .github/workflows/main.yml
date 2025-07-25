@@ -43,7 +43,7 @@ jobs:
       - name: build and push dispatcher service
         uses: docker/build-push-action@v6
         with:
-          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/dispatcher
+          context: ./dispatcher
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-dispatcher
@@ -52,7 +52,7 @@ jobs:
       - name: build and push node service
         uses: docker/build-push-action@v6
         with:
-          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/node
+          context: ./node
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-node
@@ -61,7 +61,7 @@ jobs:
       - name: build and push email verification service
         uses: docker/build-push-action@v6
         with:
-          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/email-verification
+          context: ./email-verification
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
