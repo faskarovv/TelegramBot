@@ -46,8 +46,8 @@ jobs:
       - name: build and push dispatcher service
         uses: docker/build-push-action@v6
         with:
-          context: ./dispatcher/Dockerfile
-          dockerfile: Dockerfile
+          context: ./dispatcher
+          dockerfile: ./dispatcher/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-dispatcher
 
@@ -55,8 +55,8 @@ jobs:
       - name: build and push node service
         uses: docker/build-push-action@v6
         with:
-          context: ./node/Dockerfile
-          dockerfile: Dockerfile
+          context: ./node
+          dockerfile: ./node/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-node
 
@@ -64,8 +64,8 @@ jobs:
       - name: build and push email verification service
         uses: docker/build-push-action@v6
         with:
-          context: ./email-verification/Dockerfile
-          dockerfile: Dockerfile
+          context: ./email-verification
+          dockerfile: ./email-verification/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
 
