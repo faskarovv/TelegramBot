@@ -28,3 +28,49 @@ jobs:
 
       - name: running tests
         run: ./gradlew test
+
+  docker-build-and-push:
+    name: building and pushing into docker hub
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: login to dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: build and push dispatcher service
+        uses: docker/build-push-action@v6
+        with:
+          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/dispatcher
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-dispatcher
+
+
+      - name: build and push node service
+        uses: docker/build-push-action@v6
+        with:
+          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/node
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-node
+
+
+      - name: build and push email verification service
+        uses: docker/build-push-action@v6
+        with:
+          context: /Users/askarovfarid/IdeaProjects/testing/TelegramBot/email-verification
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
+
+  deploy:
+    name: deploy into droplet
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
