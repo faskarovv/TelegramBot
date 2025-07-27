@@ -12,9 +12,9 @@ spring:
     username: ${postgres.username}
     password:  ${postgres.password}
   jpa:
-    generate-ddl: true
+    generate-ddl: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

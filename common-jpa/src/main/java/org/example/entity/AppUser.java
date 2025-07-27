@@ -45,9 +45,6 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private UserState userState;
 
-//    @OneToOne(mappedBy = "appUser")
-//    private UserToken userToken;
-
     @OneToMany(mappedBy = "appUser")
     @JsonManagedReference
     private List<AppFile> appFileList;
