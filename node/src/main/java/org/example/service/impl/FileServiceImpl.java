@@ -141,9 +141,7 @@ public class FileServiceImpl implements FileService {
 
         URL presignedUrl = s3Presigner.presignGetObject(getObjectPresignRequest).url();
 
-//        return presignedUrl.toString();
-        return "<html><body><a href=\"" + presignedUrl.toString() + "\">Download File</a></body></html>";
-
+        return presignedUrl.toString();
     }
 
 
