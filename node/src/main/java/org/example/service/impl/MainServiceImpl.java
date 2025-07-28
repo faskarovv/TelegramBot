@@ -86,7 +86,7 @@ public class MainServiceImpl implements MainService {
 
             files.forEach(file -> {
                 String presignedUrl = fileService.generatePresignedUrl(file);
-                sendAnswerLink(appUser.getTelegramBotId(), presignedUrl);
+                sendAnswer(appUser.getTelegramBotId(), presignedUrl);
             });
 
             return "Here are the files you requested" + days;
@@ -128,7 +128,7 @@ public class MainServiceImpl implements MainService {
 
             var answer = "Document successfully downloaded here is the link \n"
                     + presignedUrl;
-            sendAnswerLink(update.getMessage().getChatId(), answer);
+            sendAnswer(update.getMessage().getChatId(), answer);
         } catch (UploadFileException e) {
             log.error(e.getMessage());
             String error = "Unfortunately could not generate the photo";
@@ -155,7 +155,7 @@ public class MainServiceImpl implements MainService {
             var answer = "Photo successfully downloaded here is the link \n"
                     + presignedUrl;
 
-            sendAnswerLink(update.getMessage().getChatId(), answer);
+            sendAnswer(update.getMessage().getChatId(), answer);
         } catch (UploadFileException e) {
             log.error(e.getMessage());
             String error = "Unfortunately could not generate the file";
@@ -215,7 +215,7 @@ public class MainServiceImpl implements MainService {
 
         userAppFiles.forEach(file -> {
             String presignedUrl = fileService.generatePresignedUrl(file);
-            sendAnswerLink(appUser.getTelegramBotId(), presignedUrl);
+            sendAnswer(appUser.getTelegramBotId(), presignedUrl);
         });
 
         return "Here are the files you uploaded";
@@ -270,13 +270,6 @@ public class MainServiceImpl implements MainService {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
-        producerService.produceAnswer(sendMessage);
-    }
-
-    private void sendAnswerLink(Long chatId, String output) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setParseMode("Markdown");
         producerService.produceAnswer(sendMessage);
     }
 
