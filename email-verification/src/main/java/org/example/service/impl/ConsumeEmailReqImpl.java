@@ -14,7 +14,7 @@ public class ConsumeEmailReqImpl implements ConsumeEmailReq {
 
     private final EmailSendImpl emailSend;
 
-    @Override
+
     @RabbitListener(queues = EMAIL_SEND_QUEUE )
     public void consumeEmailReq(String email) {
         log.info("Attempting to consume email {}" , email);

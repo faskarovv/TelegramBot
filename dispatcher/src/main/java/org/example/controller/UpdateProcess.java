@@ -76,6 +76,7 @@ public class UpdateProcess {
     private void processDocMessage(Update update) {
         updateProducer.produce(RabbitMqQueue.DOC_MESSAGE_UPDATE, update);
         setFileIsReceivedView(update);
+        log.info("chatId {}" , update.getMessage().getChatId());
     }
 
     private void processTextMessage(Update update) {
