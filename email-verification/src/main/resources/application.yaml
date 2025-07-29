@@ -12,7 +12,7 @@ spring:
     username: ${postgres.username}
     password: ${postgres.password}
   jpa:
-    generate-ddl: true
+    generate-ddl: false
   main:
     allow-bean-definition-overriding: true
   autoconfigure:
