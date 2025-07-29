@@ -102,7 +102,7 @@ public class MainServiceImpl implements MainService {
             appUserRepo.save(appUser);
             producerService.produceEmailReq(userEmail);
 
-            output = "email sent to user please check your email";
+            output = "email sent to user please check your email ";
         } else {
             output = "provide a valid email!!!!!!!";
         }
