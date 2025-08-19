@@ -18,6 +18,7 @@ public class AppFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String telegramFileId;
+    @Column(name = "s3_key")
     private String s3Key;
     private String mimeType;
     private String fileName;

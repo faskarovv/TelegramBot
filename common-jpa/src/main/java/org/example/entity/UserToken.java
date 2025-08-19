@@ -32,10 +32,6 @@ public class UserToken {
 
     private boolean used;
 
-//    @OneToOne
-//    @JoinColumn(name = "app_user_id" , referencedColumnName = "id")
-//    private AppUser appUser;
-
     @Column(name = "app_user_id" , nullable = false , unique = true)
     private Long appUserId;
 }

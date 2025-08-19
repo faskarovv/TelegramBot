@@ -1,0 +1,90 @@
+name: Build and Deploy telegram bot
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build-and-test:
+    name: Build and Deploy Telegram bot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+
+      - name: makes executable
+        run: chmod +x ./gradlew
+
+      - name: clean and build
+        run: ./gradlew clean build --no-scan
+
+      - name: running tests
+        run: ./gradlew test
+
+      - name: login to dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: build and push dispatcher service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./dispatcher
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-dispatcher
+
+
+      - name: build and push node service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./node
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-node
+
+
+      - name: build and push email verification service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./email-verification
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/telegrambot-emailverification
+
+  deploy:
+    name: deploying into droplet
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          envs: DOCKER_HUB_USERNAME,DOCKER_HUB_ACCESS_TOKEN
+          script: |
+            echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+
+            cd /opt/telegrambot
+            
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d --build
+            
+            
+
+
+

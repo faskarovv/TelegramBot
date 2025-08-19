@@ -28,6 +28,9 @@ subprojects {
 ext {
     telegramStarterVersion = '6.9.7.1'
 }
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
 
 test {
     useJUnitPlatform()

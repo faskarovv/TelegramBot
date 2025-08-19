@@ -229,6 +229,11 @@ public class MainServiceImpl implements MainService {
 
     private String help() {
         return """
+                
+                Main purpose of this bot is to store your photo and file documents in a object storage server.
+                You can achieves this by simply sending your documents to the chat and in return you will receive a downloadable url.
+                If in any case you are stucked just cancel the command with /cancel command and re register.
+                
                 List of possible commands:\s
                 /cancel - cancellation of the current command\s
                 /registration - registration of the user\s
