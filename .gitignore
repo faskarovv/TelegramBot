@@ -45,3 +45,7 @@ bin/
 dispatcher.env
 emailVerification.env
 node1.env
+
+node/.infisical.json
+s
+TelegramBot/.infisical.json
